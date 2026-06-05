@@ -8,6 +8,7 @@ import { supabase } from "@/lib/supabase";
 type Episode = {
   id: string;
   user_id: string;
+  starting_point_id: string | null;
   title: string;
   life_phase: string | null;
   approximate_age: number | null;
@@ -37,6 +38,15 @@ type Reflection = {
   integration_phrase: string | null;
 };
 
+type StartingPoint = {
+  id: string;
+  current_pain: string;
+  life_area: string | null;
+  current_repetition: string | null;
+  possible_origin: string | null;
+  intensity: number | null;
+};
+
 export default function EpisodioDetalhePage() {
   const params = useParams();
   const router = useRouter();
@@ -45,6 +55,7 @@ export default function EpisodioDetalhePage() {
   const [userId, setUserId] = useState("");
   const [episode, setEpisode] = useState<Episode | null>(null);
   const [reflection, setReflection] = useState<Reflection | null>(null);
+  const [startingPoint, setStartingPoint] = useState<StartingPoint | null>(null);
 
   const [oldSelfText, setOldSelfText] = useState("");
   const [todaySelfText, setTodaySelfText] = useState("");
@@ -93,6 +104,21 @@ export default function EpisodioDetalhePage() {
       }
 
       setEpisode(episodeData);
+
+      if (episodeData.starting_point_id) {
+        const { data: startingPointData, error: startingPointError } = await supabase
+          .from("starting_points")
+          .select(
+            "id, current_pain, life_area, current_repetition, possible_origin, intensity"
+          )
+          .eq("id", episodeData.starting_point_id)
+          .eq("user_id", user.id)
+          .maybeSingle();
+      
+        if (!startingPointError && startingPointData) {
+          setStartingPoint(startingPointData);
+        }
+      }
 
       const { data: reflectionData, error: reflectionError } = await supabase
         .from("episode_reflections")
@@ -413,7 +439,69 @@ export default function EpisodioDetalhePage() {
             </div>
           </div>
         </header>
+        {startingPoint && (
+  <section className="mt-6 rounded-[2rem] border border-[#D8C7B1] bg-[#FBF7EF] p-5 shadow-sm md:p-6">
+    <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
+      <div>
+        <p className="text-sm font-medium uppercase tracking-[0.22em] text-[#6F6256]">
+          Ponto de partida
+        </p>
 
+        <h2 className="mt-2 text-2xl font-semibold text-[#241F1A]">
+          A dor presente que levou a este episódio.
+        </h2>
+
+        <p className="mt-2 max-w-3xl text-sm leading-6 text-[#6F6256]">
+          Este episódio foi registrado a partir de algo que estava pedindo
+          atenção no presente. A ligação abaixo não precisa ser uma causa
+          absoluta; ela funciona como uma hipótese pessoal de sentido.
+        </p>
+      </div>
+
+      <span className="w-fit rounded-full bg-[#66785F]/15 px-3 py-1 text-xs font-semibold text-[#66785F]">
+        Intensidade {startingPoint.intensity || 3}/5
+      </span>
+    </div>
+
+    <div className="mt-5 grid gap-4 md:grid-cols-2">
+      <div className="rounded-2xl bg-white p-4">
+        <p className="text-sm font-semibold text-[#5B3A29]">
+          O que estava doendo no presente
+        </p>
+        <p className="mt-2 whitespace-pre-wrap text-sm leading-6 text-[#6F6256]">
+          {startingPoint.current_pain}
+        </p>
+      </div>
+
+      <div className="rounded-2xl bg-white p-4">
+        <p className="text-sm font-semibold text-[#5B3A29]">
+          Área onde isso aparecia
+        </p>
+        <p className="mt-2 text-sm leading-6 text-[#6F6256]">
+          {startingPoint.life_area || "Não informada"}
+        </p>
+      </div>
+
+      <div className="rounded-2xl bg-white p-4">
+        <p className="text-sm font-semibold text-[#5B3A29]">
+          Repetição percebida
+        </p>
+        <p className="mt-2 whitespace-pre-wrap text-sm leading-6 text-[#6F6256]">
+          {startingPoint.current_repetition || "Não informada"}
+        </p>
+      </div>
+
+      <div className="rounded-2xl bg-white p-4">
+        <p className="text-sm font-semibold text-[#5B3A29]">
+          Possível ligação com a história
+        </p>
+        <p className="mt-2 whitespace-pre-wrap text-sm leading-6 text-[#6F6256]">
+          {startingPoint.possible_origin || "Não informada"}
+        </p>
+      </div>
+    </div>
+  </section>
+)}
         <section className="mt-6 grid gap-6 lg:grid-cols-[0.8fr_1.2fr]">
           <aside className="space-y-4">
             <div className="rounded-[2rem] border border-[#E3D6C3] bg-white p-5 shadow-sm">

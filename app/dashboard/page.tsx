@@ -26,10 +26,21 @@ export default function DashboardPage() {
 
   const [profile, setProfile] = useState<Profile | null>(null);
   const [episodes, setEpisodes] = useState<Episode[]>([]);
+  const [modoDiscreto, setModoDiscreto] = useState(false);
   const [carregando, setCarregando] = useState(true);
   const [saindo, setSaindo] = useState(false);
   const [erro, setErro] = useState("");
 
+
+  useEffect(() => {
+    const preferenciaSalva = window.localStorage.getItem(
+      "teoria-universal-modo-discreto"
+    );
+  
+    if (preferenciaSalva === "ativo") {
+      setModoDiscreto(true);
+    }
+  }, []);
   useEffect(() => {
     async function carregarDados() {
       setCarregando(true);
@@ -183,6 +194,19 @@ export default function DashboardPage() {
         };
       })();
 
+      function alternarModoDiscreto() {
+        setModoDiscreto((valorAtual) => {
+          const novoValor = !valorAtual;
+      
+          window.localStorage.setItem(
+            "teoria-universal-modo-discreto",
+            novoValor ? "ativo" : "inativo"
+          );
+      
+          return novoValor;
+        });
+      }
+
   async function handleSair() {
     setSaindo(true);
     await supabase.auth.signOut();
@@ -237,28 +261,36 @@ export default function DashboardPage() {
           </div>
 
           <div className="flex flex-col gap-3 sm:flex-row md:items-center">
-          <Link
-  href="/dashboard/ponto-de-partida"
-  className="rounded-full bg-[#2A1D16] px-5 py-3 text-center text-sm font-semibold text-white transition hover:bg-[#5B3A29]"
->
-  Começar pelo que sinto hoje
-</Link>
+  <Link
+    href="/dashboard/ponto-de-partida"
+    className="rounded-full bg-[#2A1D16] px-5 py-3 text-center text-sm font-semibold text-white transition hover:bg-[#5B3A29]"
+  >
+    Começar pelo que sinto hoje
+  </Link>
 
-<Link
-  href="/dashboard/episodios/novo"
-  className="rounded-full border border-[#CBB89E] bg-white px-5 py-3 text-center text-sm font-semibold text-[#5B3A29] transition hover:bg-[#FBF7EF]"
->
-  Registrar direto
-</Link>  
+  <Link
+    href="/dashboard/episodios/novo"
+    className="rounded-full border border-[#CBB89E] bg-white px-5 py-3 text-center text-sm font-semibold text-[#5B3A29] transition hover:bg-[#FBF7EF]"
+  >
+    Registrar direto
+  </Link>
 
-            <button
-              onClick={handleSair}
-              disabled={saindo}
-              className="rounded-full border border-[#CBB89E] bg-white px-5 py-3 text-sm font-semibold text-[#5B3A29] transition hover:bg-[#FBF7EF] disabled:opacity-60"
-            >
-              {saindo ? "Saindo..." : "Sair"}
-            </button>
-          </div>
+  <button
+    type="button"
+    onClick={alternarModoDiscreto}
+    className="rounded-full border border-[#CBB89E] bg-white px-5 py-3 text-sm font-semibold text-[#5B3A29] transition hover:bg-[#FBF7EF]"
+  >
+    {modoDiscreto ? "Mostrar lembranças" : "Ocultar lembranças"}
+  </button>
+
+  <button
+    onClick={handleSair}
+    disabled={saindo}
+    className="rounded-full border border-[#CBB89E] bg-white px-5 py-3 text-sm font-semibold text-[#5B3A29] transition hover:bg-[#FBF7EF] disabled:opacity-60"
+  >
+    {saindo ? "Saindo..." : "Sair"}
+  </button>
+</div> 
         </header>
 
         {erro && (
@@ -284,11 +316,17 @@ export default function DashboardPage() {
     </div>
 
     <Link
-      href={proximoPasso.href}
-      className="rounded-full bg-[#2A1D16] px-6 py-3 text-center text-sm font-semibold text-white transition hover:bg-[#5B3A29]"
-    >
-      {proximoPasso.botao}
-    </Link>
+  href={
+    modoDiscreto && proximoPasso.href.includes("/dashboard/episodios/")
+      ? "/dashboard/linha-da-vida"
+      : proximoPasso.href
+  }
+  className="rounded-full bg-[#2A1D16] px-6 py-3 text-center text-sm font-semibold text-white transition hover:bg-[#5B3A29]"
+>
+  {modoDiscreto && proximoPasso.href.includes("/dashboard/episodios/")
+    ? "Abrir linha da vida"
+    : proximoPasso.botao}
+</Link> 
   </div>
 </section>
 
@@ -338,6 +376,37 @@ export default function DashboardPage() {
             </p>
           </div>
         </section>
+        {modoDiscreto ? (
+  <section className="mt-6 rounded-[2rem] border border-[#E3D6C3] bg-white p-5 shadow-sm md:p-6">
+    <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+      <div>
+        <h2 className="text-xl font-semibold">Lembranças ocultas</h2>
+        <p className="mt-2 max-w-3xl text-sm leading-6 text-[#6F6256]">
+          Os títulos e detalhes dos episódios estão ocultos neste momento.
+          Você ainda pode acompanhar seu progresso geral, iniciar um novo ponto
+          de partida ou abrir a linha da vida quando se sentir pronto.
+        </p>
+      </div>
+
+      <div className="flex flex-col gap-3 sm:flex-row">
+        <Link
+          href="/dashboard/linha-da-vida"
+          className="rounded-full border border-[#CBB89E] bg-white px-5 py-3 text-center text-sm font-semibold text-[#5B3A29] transition hover:bg-[#FBF7EF]"
+        >
+          Abrir linha da vida
+        </Link>
+
+        <button
+          type="button"
+          onClick={alternarModoDiscreto}
+          className="rounded-full bg-[#2A1D16] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[#5B3A29]"
+        >
+          Mostrar lembranças
+        </button>
+      </div>
+    </div>
+  </section>
+) : (
         <section className="mt-6 grid gap-6 lg:grid-cols-2">
   <div className="rounded-[2rem] border border-[#E3D6C3] bg-white p-5 shadow-sm md:p-6">
     <div className="flex items-start justify-between gap-4">
@@ -466,6 +535,7 @@ export default function DashboardPage() {
     )}
   </div>
 </section>
+)}
         <section className="mt-6 grid gap-6 lg:grid-cols-[0.9fr_1.1fr]">
           <div className="rounded-[2rem] border border-[#E3D6C3] bg-white p-5 shadow-sm md:p-6">
             <h2 className="text-xl font-semibold">Sua linha da vida</h2>
@@ -504,15 +574,41 @@ export default function DashboardPage() {
           </div>
 
           <div className="rounded-[2rem] border border-[#E3D6C3] bg-white p-5 shadow-sm md:p-6">
+          {modoDiscreto ? (
+  <div>
+    <h2 className="text-xl font-semibold">Últimos episódios</h2>
+    <p className="mt-2 text-sm leading-6 text-[#6F6256]">
+      Os detalhes dos últimos episódios estão ocultos no modo discreto.
+    </p>
+
+    <div className="mt-5 rounded-2xl border border-dashed border-[#CBB89E] bg-[#FBF7EF] p-5">
+      <p className="font-semibold text-[#5B3A29]">
+        Conteúdo sensível protegido.
+      </p>
+      <p className="mt-2 text-sm leading-6 text-[#6F6256]">
+        Quando quiser ver os títulos e detalhes novamente, desative o modo
+        discreto.
+      </p>
+
+      <button
+        type="button"
+        onClick={alternarModoDiscreto}
+        className="mt-4 rounded-full bg-[#2A1D16] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[#5B3A29]"
+      >
+        Mostrar lembranças
+      </button>
+    </div>
+  </div>
+) : ( 
             <div className="flex items-center justify-between gap-4">
               <div>
                 <h2 className="text-xl font-semibold">Últimos episódios</h2>
                 <p className="mt-2 text-sm leading-6 text-[#6F6256]">
                   Os episódios mais recentes que você registrou.
-                </p>
+                </p>              
               </div>
             </div>
-
+           )}
             {episodes.length === 0 ? (
               <div className="mt-5 rounded-2xl border border-dashed border-[#CBB89E] bg-[#FBF7EF] p-5">
                 <p className="font-semibold text-[#5B3A29]">
