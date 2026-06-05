@@ -504,9 +504,7 @@ export default function EpisodioDetalhePage() {
             <div className="mt-7 rounded-[1.5rem] bg-[#FBF7EF] p-5">
               <h3 className="text-lg font-semibold">Comparativo</h3>
               <p className="mt-2 text-sm leading-6 text-[#6F6256]">
-                Aqui o app separa a interpretação antiga da nova leitura. O ser
-                humano adora confundir fato com sentença final, então vamos
-                pelo menos organizar essa bagunça com campos decentes.
+                Aqui o app separa a interpretação antiga da nova leitura. Este comparativo ajuda a separar o fato vivido da interpretação que nasceu dele, abrindo espaço para uma leitura mais consciente.
               </p>
 
               <div className="mt-5 grid gap-5 md:grid-cols-2">
@@ -640,8 +638,7 @@ export default function EpisodioDetalhePage() {
 
     <p className="mt-2 text-sm leading-6 text-[#6F6256]">
       Aqui aparece a diferença entre a interpretação antiga e a leitura que
-      começa a nascer agora. Porque sim, às vezes a mente pega um episódio
-      antigo e usa como sentença eterna, essa pequena tragédia administrativa.
+      começa a nascer agora. Às vezes uma lembrança antiga passa a funcionar como uma sentença sobre quem somos. Este espaço ajuda a revisar essa leitura com mais consciência.
     </p>
 
     <div className="mt-5 grid gap-4 md:grid-cols-2">
@@ -713,7 +710,7 @@ export default function EpisodioDetalhePage() {
   {!integrationPhrase.trim() && (
     <p className="mt-3 text-sm leading-6 text-[#6F6256]">
       Para liberar este botão, escreva primeiro uma frase de integração.
-      Até o app sabe esperar o fechamento mínimo da cena, veja que milagre.
+      Esse passo ajuda a dar um fechamento mínimo antes de integrar o episódio.
     </p>
   )}
 </div>

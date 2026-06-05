@@ -138,10 +138,24 @@ export default function Home() {
           </div>
         </div>
 
-        <footer className="border-t border-[#E3D6C3] py-5 text-sm text-[#6F6256]">
-          Teoria Universal — um método para reconstruir a própria história sem
-          negar a verdade vivida.
-        </footer>
+        <footer className="flex flex-col gap-3 border-t border-[#E3D6C3] py-5 text-sm text-[#6F6256] md:flex-row md:items-center md:justify-between">
+  <p>
+    Teoria Universal — um método para reconstruir a própria história sem
+    negar a verdade vivida.
+  </p>
+
+  <div className="flex flex-wrap gap-3">
+    <Link href="/termos" className="font-medium text-[#5B3A29] hover:underline">
+      Termos de Uso
+    </Link>
+    <Link
+      href="/privacidade"
+      className="font-medium text-[#5B3A29] hover:underline"
+    >
+      Política de Privacidade
+    </Link>
+  </div>
+</footer>
       </section>
     </main>
   );

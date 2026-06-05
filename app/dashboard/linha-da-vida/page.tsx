@@ -256,9 +256,7 @@ export default function LinhaDaVidaPage() {
         </h2>
 
         <p className="mt-2 text-sm leading-6 text-[#6F6256]">
-          Filtre por status, fase da vida ou tema principal. Quando a linha da
-          vida crescer, isso evita que você role a página como quem procura uma
-          meia perdida na existência.
+          Filtre por status, fase da vida ou tema principal. Quando a linha da vida crescer, os filtros ajudam você a encontrar episódios específicos com mais clareza.
         </p>
       </div>
 
@@ -344,9 +342,7 @@ export default function LinhaDaVidaPage() {
 
             <p className="mt-3 max-w-2xl text-sm leading-6 text-[#6F6256]">
               Comece por um episódio simples. Uma lembrança, uma fase, uma
-              escolha, uma dor, uma conquista ou um recomeço. Não precisa abrir
-              a gaveta mais pesada da alma no primeiro clique, porque isso seria
-              até eficiente demais para um ser humano.
+              escolha, uma dor, uma conquista ou um recomeço. Comece por algo possível de olhar agora. A reconstrução da história pode acontecer em partes, com respeito ao seu próprio ritmo.
             </p>
 
             <Link
@@ -375,9 +371,7 @@ export default function LinhaDaVidaPage() {
     </p>
 
     <p className="mt-2 text-sm leading-6 text-[#6F6256]">
-      Tente limpar os filtros ou escolher outra fase, tema ou status. Nem toda
-      memória aparece quando a gente exige critérios demais, o que é quase uma
-      metáfora ofensivamente precisa.
+      Tente limpar os filtros ou escolher outra fase, tema ou status. Tente limpar os filtros ou escolher outra fase, tema ou status para ampliar a busca.
     </p>
 
     <button
