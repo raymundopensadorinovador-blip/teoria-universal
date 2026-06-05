@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { FormEvent, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 
 const fasesDaVida = [
@@ -37,6 +37,15 @@ const temasPrincipais = [
   "Outro tema",
 ];
 
+type StartingPoint = {
+  id: string;
+  current_pain: string;
+  life_area: string | null;
+  current_repetition: string | null;
+  possible_origin: string | null;
+  intensity: number | null;
+};
+
 export default function NovoEpisodioPage() {
   const router = useRouter();
 
@@ -51,8 +60,51 @@ export default function NovoEpisodioPage() {
   const [oldBelief, setOldBelief] = useState("");
   const [markedPhrase, setMarkedPhrase] = useState("");
 
+  const [startingPointId, setStartingPointId] = useState("");
+  const [startingPoint, setStartingPoint] = useState<StartingPoint | null>(null);
+  const [carregandoPonto, setCarregandoPonto] = useState(false);
+
   const [carregando, setCarregando] = useState(false);
   const [erro, setErro] = useState("");
+
+  useEffect(() => {
+    async function carregarPontoDePartida() {
+      const params = new URLSearchParams(window.location.search);
+      const pontoId = params.get("ponto");
+  
+      if (!pontoId) return;
+  
+      setStartingPointId(pontoId);
+      setCarregandoPonto(true);
+  
+      const {
+        data: { user },
+        error: userError,
+      } = await supabase.auth.getUser();
+  
+      if (userError || !user) {
+        router.push("/login");
+        return;
+      }
+  
+      const { data, error } = await supabase
+        .from("starting_points")
+        .select(
+          "id, current_pain, life_area, current_repetition, possible_origin, intensity"
+        )
+        .eq("id", pontoId)
+        .eq("user_id", user.id)
+        .single();
+  
+      if (!error && data) {
+        setStartingPoint(data);
+      }
+  
+      setCarregandoPonto(false);
+    }
+  
+    carregarPontoDePartida();
+  }, [router]);
 
   async function handleSalvar(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -92,10 +144,11 @@ export default function NovoEpisodioPage() {
         ? Number.parseInt(approximateYear, 10)
         : null;
 
-      const { data, error } = await supabase
+        const { data, error } = await supabase
         .from("life_episodes")
         .insert({
           user_id: user.id,
+          starting_point_id: startingPointId || null,
           title: tituloLimpo,
           life_phase: lifePhase || null,
           approximate_age: Number.isNaN(idadeNumber) ? null : idadeNumber,
@@ -111,12 +164,23 @@ export default function NovoEpisodioPage() {
         .select("id")
         .single();
 
-      if (error) {
-        setErro("Não foi possível salvar este episódio agora.");
-        return;
-      }
-
-      router.push(`/dashboard/episodios/${data.id}`);
+        if (error) {
+          setErro("Não foi possível salvar este episódio agora.");
+          return;
+        }
+        
+        if (startingPointId) {
+          await supabase
+            .from("starting_points")
+            .update({
+              created_episode_id: data.id,
+              updated_at: new Date().toISOString(),
+            })
+            .eq("id", startingPointId)
+            .eq("user_id", user.id);
+        }
+        
+        router.push(`/dashboard/episodios/${data.id}`); 
     } catch {
       setErro("Ocorreu um erro inesperado ao salvar o episódio.");
     } finally {
@@ -266,8 +330,7 @@ export default function NovoEpisodioPage() {
 
               <p className="mt-2 text-sm leading-6 text-[#6F6256]">
                 Use isso apenas como referência pessoal. Impacto alto não quer
-                dizer que você precisa resolver tudo hoje. O app não é fiscal
-                da sua alma, felizmente.
+                dizer que você precisa resolver tudo hoje. Use esse nível apenas como uma referência pessoal, sem obrigação de resolver tudo agora.
               </p>
             </div>
           </section>
@@ -353,6 +416,70 @@ export default function NovoEpisodioPage() {
               {carregando ? "Salvando..." : "Salvar episódio"}
             </button>
           </div>
+          {carregandoPonto && (
+  <section className="mb-6 rounded-[2rem] border border-[#E3D6C3] bg-white p-5 shadow-sm">
+    <p className="text-sm font-medium text-[#6F6256]">
+      Carregando ponto de partida...
+    </p>
+  </section>
+)}
+
+{startingPoint && (
+  <section className="mb-6 rounded-[2rem] border border-[#D8C7B1] bg-[#FBF7EF] p-5 shadow-sm md:p-6">
+    <p className="text-sm font-medium uppercase tracking-[0.22em] text-[#6F6256]">
+      Ponto de partida deste episódio
+    </p>
+
+    <h2 className="mt-2 text-2xl font-semibold text-[#241F1A]">
+      A dor presente que trouxe você até este registro.
+    </h2>
+
+    <div className="mt-5 grid gap-4 md:grid-cols-2">
+      <div className="rounded-2xl bg-white p-4">
+        <p className="text-sm font-semibold text-[#5B3A29]">
+          O que está pedindo atenção hoje
+        </p>
+        <p className="mt-2 whitespace-pre-wrap text-sm leading-6 text-[#6F6256]">
+          {startingPoint.current_pain}
+        </p>
+      </div>
+
+      <div className="rounded-2xl bg-white p-4">
+        <p className="text-sm font-semibold text-[#5B3A29]">
+          Área onde aparece
+        </p>
+        <p className="mt-2 text-sm leading-6 text-[#6F6256]">
+          {startingPoint.life_area || "Não informada"}
+        </p>
+      </div>
+
+      <div className="rounded-2xl bg-white p-4">
+        <p className="text-sm font-semibold text-[#5B3A29]">
+          Repetição percebida
+        </p>
+        <p className="mt-2 whitespace-pre-wrap text-sm leading-6 text-[#6F6256]">
+          {startingPoint.current_repetition || "Não informada"}
+        </p>
+      </div>
+
+      <div className="rounded-2xl bg-white p-4">
+        <p className="text-sm font-semibold text-[#5B3A29]">
+          Possível ligação com a história
+        </p>
+        <p className="mt-2 whitespace-pre-wrap text-sm leading-6 text-[#6F6256]">
+          {startingPoint.possible_origin || "Ainda não informada"}
+        </p>
+      </div>
+    </div>
+
+    <p className="mt-4 text-sm leading-6 text-[#6F6256]">
+      Intensidade no presente:{" "}
+      <strong className="text-[#5B3A29]">
+        {startingPoint.intensity || 3}/5
+      </strong>
+    </p>
+  </section>
+)}
         </form>
       </div>
     </main>

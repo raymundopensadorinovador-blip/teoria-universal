@@ -237,12 +237,19 @@ export default function DashboardPage() {
           </div>
 
           <div className="flex flex-col gap-3 sm:flex-row md:items-center">
-            <Link
-              href="/dashboard/episodios/novo"
-              className="rounded-full bg-[#2A1D16] px-5 py-3 text-center text-sm font-semibold text-white transition hover:bg-[#5B3A29]"
-            >
-              Novo episódio
-            </Link>
+          <Link
+  href="/dashboard/ponto-de-partida"
+  className="rounded-full bg-[#2A1D16] px-5 py-3 text-center text-sm font-semibold text-white transition hover:bg-[#5B3A29]"
+>
+  Começar pelo que sinto hoje
+</Link>
+
+<Link
+  href="/dashboard/episodios/novo"
+  className="rounded-full border border-[#CBB89E] bg-white px-5 py-3 text-center text-sm font-semibold text-[#5B3A29] transition hover:bg-[#FBF7EF]"
+>
+  Registrar direto
+</Link>  
 
             <button
               onClick={handleSair}
@@ -355,7 +362,7 @@ export default function DashboardPage() {
         <p className="mt-2 text-sm leading-6 text-[#6F6256]">
           Os episódios registrados até aqui estão integrados. Isso não significa
           vida resolvida, mas significa que você fechou bem essa parte
-          registrada. Já é alguma coisa, veja só.
+          registrada. Esse é um avanço importante dentro da sua jornada registrada.
         </p>
       </div>
     ) : (
@@ -486,7 +493,7 @@ export default function DashboardPage() {
                 className="block rounded-2xl border border-[#E3D6C3] bg-[#FBF7EF] p-4 transition hover:bg-[#F6F1E8]"
               >
                 <p className="font-semibold text-[#5B3A29]">
-                  Registrar novo episódio
+                Registrar episódio diretamente
                 </p>
                 <p className="mt-1 text-sm leading-6 text-[#6F6256]">
                   Comece por uma lembrança, uma fase, uma dor, uma decisão ou
@@ -513,8 +520,7 @@ export default function DashboardPage() {
                 </p>
                 <p className="mt-2 text-sm leading-6 text-[#6F6256]">
                   Comece por algo simples. Não precisa ser o maior trauma da
-                  sua vida logo na primeira tela. O app não está com pressa,
-                  diferente do resto da humanidade.
+                  sua vida logo na primeira tela. Você pode começar por uma lembrança pequena, uma fase importante ou um episódio que esteja pronto para olhar agora.
                 </p>
 
                 <Link
